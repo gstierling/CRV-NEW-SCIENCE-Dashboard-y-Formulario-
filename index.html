@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Science</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Paleta New Science */
+    --bg:#f2f7f6;
+    --panel:#ffffff;
+    --panel-2:#e8f2f1;
+    --teal:#0194aa;
+    --teal-dark:#016b7c;
+    --red:#5e8c17;
+    --red-dark:#4a7011;
+    --gold:#a3ab00;
+    --verde:#80ba27;
+    --lima:#cad401;
+    --text:#10302f;
+    --text-dim:#5f7676;
+    --border:#d3e3e2;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Nunito',sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:16px 14px 36px;
+    overflow-x:hidden;
+  }
+  .app-container{
+    width:100%;
+    max-width:640px;
+  }
+  .title{
+    text-align:center;
+    font-size:2.6rem;
+    font-weight:900;
+    letter-spacing:2px;
+    margin:0;
+    color:var(--teal);
+  }
+  .subtitulo-app{
+    text-align:center;
+    margin:0;
+    font-size:1.5rem;
+    font-weight:700;
+    color:var(--text-dim);
+  }
+
+  /* ===== Selector de fecha ===== */
+  .selector-fecha-wrap{
+    position:relative;
+    display:flex;
+    justify-content:center;
+    margin:6px 0 14px;
+  }
+  .selector-fecha-btn{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    font-family:'Nunito',sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    padding:9px 16px;
+    border-radius:12px;
+    cursor:pointer;
+    text-transform:capitalize;
+    transition:border-color 0.15s ease;
+    box-shadow:0 1px 3px rgba(1,107,124,0.08);
+  }
+  .selector-fecha-btn:hover{border-color:var(--teal);}
+  .selector-fecha-btn .flecha{
+    width:16px;height:16px;color:var(--red);
+    flex-shrink:0;
+    transition:transform 0.15s ease;
+  }
+  .selector-fecha-wrap.abierto .flecha{transform:rotate(180deg);}
+  .selector-fecha-lista{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    min-width:max-content;
+    width:max-content;
+    max-width:90vw;
+    max-height:260px;
+    overflow-y:auto;
+    z-index:40;
+    box-shadow:0 12px 28px rgba(1,107,124,0.18);
+  }
+  .selector-fecha-wrap.abierto .selector-fecha-lista{display:block;}
+  .opcion-fecha{
+    padding:11px 16px;
+    font-weight:600;
+    font-size:0.98rem;
+    color:var(--text);
+    cursor:pointer;
+    text-transform:capitalize;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  .opcion-fecha:last-child{border-bottom:none;}
+  .opcion-fecha:hover{background:var(--panel-2);}
+  .opcion-fecha.activa{color:var(--teal); font-weight:800;}
+
+  /* ===== Botellas entregadas ===== */
+  .bloque-botellas{
+    text-align:center;
+    margin:4px 0 16px;
+    width:100vw;
+    position:relative;
+    left:50%;
+    right:50%;
+    margin-left:-50vw;
+    margin-right:-50vw;
+    padding:0 8px;
+  }
+  .botellas-header{
+    font-size:clamp(1.3rem, 6vw, 2rem);
+    font-weight:900;
+    line-height:1.02;
+    color:var(--teal);
+    margin:0;
+    text-align:right;
+    flex-shrink:0;
+  }
+  .botellas-fila{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:nowrap;
+    gap:clamp(10px, 3.2vw, 20px);
+  }
+  .botellas-num{
+    font-size:clamp(2.8rem, 13vw, 4.8rem);
+    font-weight:900;
+    color:var(--teal-dark);
+    line-height:0.95;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .botellas-pct{
+    font-size:clamp(1rem, 4vw, 1.5rem);
+    font-weight:800;
+    color:var(--text-dim);
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+
+  /* ===== Barra deslizante (estilo MALL MARINA) ===== */
+  .seccion-joystick{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:18px 16px 22px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(1,107,124,0.06);
+  }
+  .sl-header-fila{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:6px;
+  }
+  .sl-lado{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    line-height:1;
+  }
+  .sl-lado.der{align-items:flex-end;}
+  .sl-lado-nombre{
+    font-size:clamp(1.3rem, 6vw, 1.8rem);
+    font-weight:900;
+  }
+  .sl-lado-num{
+    font-size:clamp(2.4rem, 12vw, 3.6rem);
+    font-weight:900;
+    margin-top:4px;
+  }
+  .sl-lado.izq{color:var(--teal);}
+  .sl-lado.der{color:var(--red);}
+  .sl-track-wrap{
+    position:relative;
+    height:58px;
+    display:flex;
+    align-items:center;
+  }
+  .sl-track-bg{
+    position:absolute; left:0; right:0;
+    height:16px; border-radius:8px;
+    background:linear-gradient(to right, rgba(1,148,170,0.22) 50%, rgba(128,186,39,0.25) 50%);
+  }
+  .sl-track-fill{
+    position:absolute; height:16px; border-radius:8px;
+    pointer-events:none;
+  }
+  .sl-input-bi{
+    position:absolute; left:0; right:0;
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:58px; background:transparent;
+    outline:none; cursor:pointer; margin:0; padding:0;
+    transition:none;
+  }
+  .sl-input-bi.volviendo{transition:all 0.4s cubic-bezier(.22,.68,0,1.3);}
+  .sl-input-bi::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:54px; height:54px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #12b0c7, var(--teal-dark));
+    border:4px solid #ffffff;
+    box-shadow:0 4px 14px rgba(0,0,0,.3);
+    cursor:grab;
+  }
+  .sl-input-bi::-moz-range-thumb{
+    width:54px; height:54px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #12b0c7, var(--teal-dark));
+    border:4px solid #ffffff;
+    box-shadow:0 4px 14px rgba(0,0,0,.3);
+    cursor:grab;
+  }
+  .sl-etiquetas{
+    display:flex; justify-content:space-between;
+    font-size:1rem; font-weight:800;
+    margin-top:4px; padding:0 2px;
+  }
+  .sl-etiquetas .izq{color:var(--teal);}
+  .sl-etiquetas .der{color:var(--red);}
+
+  hr.sep{
+    border:none;
+    border-top:1px solid var(--border);
+    margin:18px 0;
+  }
+
+  /* ===== Seguidores: registro (9:00 / 14:00) ===== */
+  .seccion-seguidores-entrada{
+    margin-bottom:16px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:8px 12px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(1,107,124,0.06);
+  }
+  #selector-seguidores-wrap{
+    margin:0;
+  }
+  .selector-fecha-btn-compacto{
+    padding:6px 10px;
+    gap:5px;
+    width:100%;
+    max-width:100%;
+    text-transform:none;
+    font-size:clamp(0.62rem, 3.6vw, 1.05rem);
+    white-space:nowrap;
+  }
+  .selector-fecha-btn-compacto #selector-seguidores-label{
+    white-space:nowrap;
+  }
+  .manito{
+    font-size:1.05rem;
+    line-height:1;
+    flex-shrink:0;
+  }
+  .seguidores-accion-fila{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  .btn-consultar{
+    background:var(--teal);
+    color:#ffffff;
+    border:none;
+    border-radius:10px;
+    padding:10px 18px;
+    font-family:'Nunito',sans-serif;
+    font-weight:800;
+    font-size:0.9rem;
+    cursor:pointer;
+  }
+  .btn-consultar:hover{filter:brightness(1.1);}
+  .seguidores-input{
+    background:var(--panel-2);
+    border:2px solid var(--border);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'Nunito',sans-serif;
+    font-size:1.1rem;
+    font-weight:700;
+    text-align:center;
+    padding:9px 12px;
+    width:150px;
+    outline:none;
+  }
+  .seguidores-input:focus{border-color:var(--teal);}
+  .btn-verificar{
+    background:var(--red);
+    color:#ffffff;
+    border:none;
+    border-radius:10px;
+    padding:10px 20px;
+    font-family:'Nunito',sans-serif;
+    font-weight:800;
+    font-size:0.9rem;
+    cursor:pointer;
+  }
+  .btn-verificar:hover{filter:brightness(1.1);}
+
+  @keyframes parpadeoSeguidores{
+    0%, 100%{ opacity:1; box-shadow:0 0 0 0 rgba(94,140,23,0); }
+    50%{ opacity:0.45; box-shadow:0 0 0 6px rgba(94,140,23,0.25); }
+  }
+  #selector-seguidores-wrap.parpadeando .selector-fecha-btn{
+    animation:parpadeoSeguidores 1s ease-in-out infinite;
+    border-color:var(--red);
+  }
+
+  /* ===== Resultado seguidores (final) ===== */
+  .seccion-resultado-seguidores{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:18px 16px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(1,107,124,0.06);
+    margin-top:16px;
+  }
+  .resultado-seguidores-fila{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .resultado-seguidores-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    flex:1;
+  }
+  .resultado-seguidores-titulo{
+    font-size:0.85rem;
+    font-weight:800;
+    color:var(--text-dim);
+    margin-bottom:4px;
+  }
+  .resultado-seguidores-num{
+    font-size:1.9rem;
+    font-weight:900;
+    color:var(--teal-dark);
+  }
+  .resultado-seguidores-ganados .resultado-seguidores-num{color:var(--red);}
+
+  /* ===== Encuesta rápida ===== */
+  .seccion-encuesta{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:18px 16px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(1,107,124,0.06);
+    margin-top:16px;
+  }
+  .encuesta-header{
+    font-weight:900;
+    font-size:1.95rem;
+    margin:0 0 14px;
+    color:var(--teal);
+  }
+  .encuesta-pregunta-bloque{
+    margin-bottom:14px;
+    text-align:left;
+  }
+  .encuesta-pregunta{
+    font-weight:800;
+    font-size:1.14rem;
+    margin:0 0 8px;
+    color:var(--text);
+  }
+  .encuesta-input{
+    width:100%;
+    background:var(--panel-2);
+    border:2px solid var(--border);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'Nunito',sans-serif;
+    font-size:1rem;
+    font-weight:600;
+    padding:10px 12px;
+    outline:none;
+  }
+  .encuesta-input:focus{border-color:var(--teal);}
+  .encuesta-ayuda{
+    font-size:0.9rem;
+    font-weight:700;
+    color:var(--text-dim);
+    margin:-4px 0 8px;
+  }
+  .encuesta-chips{display:flex; flex-direction:column; gap:8px;}
+  .encuesta-chips.dos{display:grid; grid-template-columns:1fr 1fr;}
+  .encuesta-chip{
+    background:var(--panel-2);
+    border:2px solid var(--border);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'Nunito',sans-serif;
+    font-size:1rem;
+    font-weight:700;
+    padding:11px 14px;
+    cursor:pointer;
+    text-align:left;
+    width:100%;
+    transition:all .15s;
+    user-select:none;
+  }
+  .encuesta-chip{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .encuesta-chip::after{
+    content:'';
+    flex-shrink:0;
+    width:22px;
+    height:22px;
+    border:2px solid var(--text-dim);
+    border-radius:50%;
+    background:#ffffff;
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    font-weight:900;
+    line-height:1;
+    color:var(--teal-dark);
+  }
+  .encuesta-chip.sel{background:var(--teal-dark); border-color:var(--teal-dark); color:#ffffff;}
+  .encuesta-chip.sel::after{
+    border-color:#ffffff;
+    box-shadow:inset 0 0 0 4px var(--teal-dark), inset 0 0 0 11px #ffffff;
+  }
+  /* Pregunta 3 (selección múltiple): cuadrado */
+  .encuesta-chip.multi::after{border-radius:5px;}
+  .encuesta-chip.multi.sel::after{
+    content:'✓';
+    box-shadow:none;
+  }
+  .encuesta-input.otra{display:none; margin-top:8px;}
+  .encuesta-input.otra.visible{display:block;}
+  .btn-enviar-encuesta{
+    background:var(--red);
+    color:#ffffff;
+    border:none;
+    border-radius:10px;
+    padding:12px 26px;
+    font-family:'Nunito',sans-serif;
+    font-weight:800;
+    font-size:0.98rem;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .btn-enviar-encuesta:hover{filter:brightness(1.1);}
+
+  /* ===== Gráficas de la encuesta (donut) ===== */
+  .seccion-graficos-encuesta{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    margin-top:16px;
+  }
+  @media (min-width:600px){
+    .seccion-graficos-encuesta{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+    }
+  }
+  .grafico-bloque{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:16px 14px 18px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(1,107,124,0.06);
+  }
+  .grafico-titulo{
+    font-weight:800;
+    font-size:1.6rem;
+    margin:0 0 12px;
+    color:var(--text);
+  }
+  .grafico-donut-wrap{
+    position:relative;
+    width:100%;
+    max-width:230px;
+    aspect-ratio:1/1;
+    margin:0 auto 14px;
+  }
+  .grafico-sin-datos{
+    display:none;
+    position:absolute;
+    inset:0;
+    align-items:center;
+    justify-content:center;
+    margin:0;
+    font-size:0.85rem;
+    font-weight:700;
+    color:var(--text-dim);
+  }
+  .grafico-sin-datos.visible{display:flex;}
+  .grafico-leyenda{
+    list-style:none;
+    margin:0;
+    padding:0;
+    text-align:left;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .leyenda-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:0.9rem;
+  }
+  .leyenda-dot{
+    width:12px;
+    height:12px;
+    border-radius:3px;
+    flex-shrink:0;
+  }
+  .leyenda-label{
+    flex:1;
+    font-weight:700;
+    color:var(--text);
+  }
+  .leyenda-valor{
+    font-weight:900;
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:22px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:12px 20px;
+    border-radius:12px;
+    font-weight:700;
+    opacity:0;
+    transition:opacity 0.25s ease, transform 0.25s ease;
+    z-index:60;
+    pointer-events:none;
+    box-shadow:0 6px 18px rgba(1,107,124,0.15);
+    max-width:88vw;
+    text-align:center;
+  }
+  .toast.mostrar{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+  .toast.error{border-color:var(--red); color:var(--red);}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <h1 class="title">New Science</h1>
+  <p class="subtitulo-app">en CicloRecreoVía</p>
+
+  <div class="selector-fecha-wrap" id="selector-fecha-wrap">
+    <button class="selector-fecha-btn" id="selector-fecha-btn" type="button">
+      <span id="selector-fecha-label">Cargando fechas…</span>
+      <svg class="flecha" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="selector-fecha-lista" id="selector-fecha-lista"></div>
+  </div>
+
+  <div class="seccion-seguidores-entrada" id="seccion-seguidores-entrada">
+    <div class="selector-fecha-wrap" id="selector-seguidores-wrap">
+      <button class="selector-fecha-btn selector-fecha-btn-compacto" id="selector-seguidores-btn" type="button">
+        <span class="manito">👉</span>
+        <span id="selector-seguidores-label">REGISTRO SEGUIDORES 9.00 y 14.00 HRS.</span>
+        <svg class="flecha" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="selector-fecha-lista" id="selector-seguidores-lista"></div>
+    </div>
+
+    <div class="seguidores-accion-fila" id="seguidores-accion-fila" style="display:none;">
+      <button class="btn-consultar" id="btn-consultar-seguidores" type="button">Consultar seguidores @newscience_cl</button>
+      <input class="seguidores-input" id="input-seguidores" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="N° seguidores">
+      <button class="btn-verificar" id="btn-ingresar-seguidores" type="button">Ingresar</button>
+    </div>
+  </div>
+
+  <div class="bloque-botellas">
+    <div class="botellas-fila">
+      <h2 class="botellas-header">Seguidores</h2>
+      <span class="botellas-num" id="suma-total">0</span>
+      <span class="botellas-pct" id="botellas-pct">(Meta 0%)</span>
+    </div>
+  </div>
+
+  <div class="seccion-joystick">
+    <div class="sl-header-fila">
+      <div class="sl-lado izq">
+        <span class="sl-lado-nombre">Ruleta</span>
+        <span class="sl-lado-num" id="conteo-ruleta">0</span>
+      </div>
+      <div class="sl-lado der">
+        <span class="sl-lado-nombre">Chequeo</span>
+        <span class="sl-lado-num" id="conteo-chequeo">0</span>
+      </div>
+    </div>
+    <div class="sl-track-wrap">
+      <div class="sl-track-bg"></div>
+      <div class="sl-track-fill" id="sl-fill"></div>
+      <input type="range" class="sl-input-bi" id="sl-bi" min="0" max="100" value="50" step="1">
+    </div>
+    <div class="sl-etiquetas">
+      <span class="izq">← Ruleta</span>
+      <span class="der">Chequeo →</span>
+    </div>
+  </div>
+
+  <div class="seccion-resultado-seguidores">
+    <div class="resultado-seguidores-fila">
+      <div class="resultado-seguidores-item">
+        <span class="resultado-seguidores-titulo">Seguidores a las 9.00 hrs.</span>
+        <span class="resultado-seguidores-num" id="resultado-seguidores-9">—</span>
+      </div>
+      <div class="resultado-seguidores-item">
+        <span class="resultado-seguidores-titulo">Seguidores a las 14.00 hrs.</span>
+        <span class="resultado-seguidores-num" id="resultado-seguidores-14">—</span>
+      </div>
+    </div>
+    <hr class="sep">
+    <div class="resultado-seguidores-item resultado-seguidores-ganados">
+      <span class="resultado-seguidores-titulo">Seguidores ganados</span>
+      <span class="resultado-seguidores-num" id="resultado-seguidores-ganados">—</span>
+    </div>
+  </div>
+
+  <div class="seccion-encuesta">
+    <h2 class="encuesta-header">Encuesta rápida</h2>
+
+    <div class="encuesta-pregunta-bloque">
+      <p class="encuesta-pregunta">1. ¿Consumes actualmente algún suplemento de Omega-3?</p>
+      <div class="encuesta-chips dos" id="chips-p1"></div>
+    </div>
+
+    <div class="encuesta-pregunta-bloque" id="bloque-p2" style="display:none;">
+      <p class="encuesta-pregunta">2. ¿Cuál marca de Omega-3 consumes?</p>
+      <div class="encuesta-chips" id="chips-p2"></div>
+      <input class="encuesta-input otra" id="otra-p2" type="text" placeholder="¿Cuál otra marca?" maxlength="80">
+    </div>
+
+    <div class="encuesta-pregunta-bloque">
+      <p class="encuesta-pregunta">3. A la hora de escoger un Omega-3, ¿en qué aspectos te fijas o fijarías?</p>
+      <p class="encuesta-ayuda">Puedes marcar más de una opción</p>
+      <div class="encuesta-chips" id="chips-p3"></div>
+      <input class="encuesta-input otra" id="otra-p3" type="text" placeholder="¿En qué otro aspecto?" maxlength="80">
+    </div>
+
+    <div class="encuesta-pregunta-bloque">
+      <p class="encuesta-pregunta">4. Después de conocer UP Omega hoy, ¿qué tan probable es que lo compres?</p>
+      <div class="encuesta-chips" id="chips-p4"></div>
+    </div>
+
+    <div class="encuesta-pregunta-bloque">
+      <p class="encuesta-pregunta">5. Después de conocer UP Omega hoy, ¿qué tan probable es que lo recomiendes?</p>
+      <div class="encuesta-chips" id="chips-p5"></div>
+    </div>
+
+    <button class="btn-enviar-encuesta" id="btn-enviar-encuesta" type="button">Enviar respuestas</button>
+  </div>
+
+  <div class="seccion-graficos-encuesta">
+    <div class="grafico-bloque">
+      <h3 class="grafico-titulo">¿Consume Omega-3?</h3>
+      <div class="grafico-donut-wrap">
+        <canvas id="chart-encuesta-1"></canvas>
+        <p class="grafico-sin-datos" id="sin-datos-1">Aún no hay respuestas</p>
+      </div>
+      <ul class="grafico-leyenda" id="leyenda-encuesta-1"></ul>
+    </div>
+    <div class="grafico-bloque">
+      <h3 class="grafico-titulo">Marca que consume</h3>
+      <div class="grafico-donut-wrap">
+        <canvas id="chart-encuesta-2"></canvas>
+        <p class="grafico-sin-datos" id="sin-datos-2">Aún no hay respuestas</p>
+      </div>
+      <ul class="grafico-leyenda" id="leyenda-encuesta-2"></ul>
+    </div>
+    <div class="grafico-bloque">
+      <h3 class="grafico-titulo">Aspectos en que se fija</h3>
+      <div class="grafico-donut-wrap">
+        <canvas id="chart-encuesta-3"></canvas>
+        <p class="grafico-sin-datos" id="sin-datos-3">Aún no hay respuestas</p>
+      </div>
+      <ul class="grafico-leyenda" id="leyenda-encuesta-3"></ul>
+    </div>
+    <div class="grafico-bloque">
+      <h3 class="grafico-titulo">Probabilidad de comprar</h3>
+      <div class="grafico-donut-wrap">
+        <canvas id="chart-encuesta-4"></canvas>
+        <p class="grafico-sin-datos" id="sin-datos-4">Aún no hay respuestas</p>
+      </div>
+      <ul class="grafico-leyenda" id="leyenda-encuesta-4"></ul>
+    </div>
+    <div class="grafico-bloque">
+      <h3 class="grafico-titulo">Probabilidad de recomendar</h3>
+      <div class="grafico-donut-wrap">
+        <canvas id="chart-encuesta-5"></canvas>
+        <p class="grafico-sin-datos" id="sin-datos-5">Aún no hay respuestas</p>
+      </div>
+      <ul class="grafico-leyenda" id="leyenda-encuesta-5"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+/* ================= CONFIGURACIÓN ================= */
+const ENDPOINT_URL = "https://script.google.com/macros/s/AKfycbwpFXDegM2MXCJTCDk0Qa44y4UDpFemcGVhNu78TEmRHjOKvr6JgF1k_WuwbMkb8erx/exec";
+const REFRESH_MS = 30000;
+const META_SEGUIDORES = 150;
+
+/* ================= FECHAS ================= */
+const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+
+function hoyKey(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function labelDeFecha(key){
+  const [y,m,d] = key.split('-').map(Number);
+  const dateObj = new Date(y, m-1, d);
+  const dia = DIAS[dateObj.getDay()];
+  const diaCap = dia.charAt(0).toUpperCase() + dia.slice(1);
+  const mesCap = MESES[m-1].charAt(0).toUpperCase() + MESES[m-1].slice(1);
+  return `${diaCap} ${d} ${mesCap}`;
+}
+
+const FECHA_HOY = hoyKey();
+let fechaSeleccionada = FECHA_HOY;
+
+/* ================= ESTADO ================= */
+let cuentaRuleta = 0;
+let cuentaChequeo = 0;
+let seguidores9Valor = null;
+let seguidores14Valor = null;
+
+/* ================= TOAST ================= */
+let toastTimer;
+function mostrarToast(msg, esError){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!esError);
+  t.classList.add('mostrar');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('mostrar'), 3200);
+}
+
+/* ================= FORMATO NUMÉRICO ================= */
+const FORMATO_MILES = new Intl.NumberFormat('es-CL');
+function formatNumero(n){
+  return FORMATO_MILES.format(n);
+}
+
+/* ================= RENDER ================= */
+function render(){
+  const total = cuentaRuleta + cuentaChequeo;
+  document.getElementById('suma-total').textContent = formatNumero(total);
+  const pct = Math.round((total / META_SEGUIDORES) * 100);
+  document.getElementById('botellas-pct').textContent = `(Meta ${formatNumero(pct)}%)`;
+
+  document.getElementById('conteo-ruleta').textContent = formatNumero(cuentaRuleta);
+  document.getElementById('conteo-chequeo').textContent = formatNumero(cuentaChequeo);
+
+  document.getElementById('resultado-seguidores-9').textContent = seguidores9Valor !== null ? formatNumero(seguidores9Valor) : '—';
+  document.getElementById('resultado-seguidores-14').textContent = seguidores14Valor !== null ? formatNumero(seguidores14Valor) : '—';
+  const ganadosEl = document.getElementById('resultado-seguidores-ganados');
+  if(seguidores9Valor !== null && seguidores14Valor !== null){
+    ganadosEl.textContent = formatNumero(seguidores14Valor - seguidores9Valor);
+  } else {
+    ganadosEl.textContent = '—';
+  }
+}
+
+/* ================= SELECTOR DE FECHA ================= */
+const wrapFecha = document.getElementById('selector-fecha-wrap');
+const btnFecha = document.getElementById('selector-fecha-btn');
+const labelFecha = document.getElementById('selector-fecha-label');
+const listaFecha = document.getElementById('selector-fecha-lista');
+
+btnFecha.addEventListener('click', () => {
+  wrapFecha.classList.toggle('abierto');
+});
+document.addEventListener('click', (ev) => {
+  if(!wrapFecha.contains(ev.target)) wrapFecha.classList.remove('abierto');
+});
+
+function pintarListaFechas(fechas){
+  listaFecha.innerHTML = '';
+  fechas.forEach(key => {
+    const opt = document.createElement('div');
+    opt.className = 'opcion-fecha' + (key === fechaSeleccionada ? ' activa' : '');
+    opt.textContent = labelDeFecha(key) + (key === FECHA_HOY ? ' (hoy)' : '');
+    opt.addEventListener('click', () => {
+      fechaSeleccionada = key;
+      wrapFecha.classList.remove('abierto');
+      labelFecha.textContent = labelDeFecha(key) + (key === FECHA_HOY ? ' (hoy)' : '');
+      pintarListaFechas(fechas);
+      cargarDatos(fechaSeleccionada);
+    });
+    listaFecha.appendChild(opt);
+  });
+}
+
+function cargarListaFechas(){
+  const cbName = 'cbf_' + Date.now();
+  window[cbName] = function(data){
+    let fechas = (data && data.fechas) ? data.fechas : [];
+    if(!fechas.includes(FECHA_HOY)) fechas.unshift(FECHA_HOY);
+    fechas.sort((a,b) => b.localeCompare(a));
+    labelFecha.textContent = labelDeFecha(fechaSeleccionada) + (fechaSeleccionada === FECHA_HOY ? ' (hoy)' : '');
+    pintarListaFechas(fechas);
+    delete window[cbName];
+    script.remove();
+  };
+  const script = document.createElement('script');
+  script.src = `${ENDPOINT_URL}?action=getFechas&callback=${cbName}`;
+  script.onerror = function(){
+    delete window[cbName];
+    script.remove();
+    labelFecha.textContent = labelDeFecha(fechaSeleccionada) + (fechaSeleccionada === FECHA_HOY ? ' (hoy)' : '');
+    pintarListaFechas([FECHA_HOY]);
+  };
+  document.body.appendChild(script);
+}
+
+/* ================= LECTURA DE DATOS (JSONP para evitar CORS) ================= */
+function cargarDatos(fecha){
+  const cbName = 'cb_' + Date.now();
+  window[cbName] = function(data){
+    if(data && !data.error){
+      cuentaRuleta = data.ruleta || 0;
+      cuentaChequeo = data.chequeo || 0;
+      seguidores9Valor = (data.seguidores9 === null || data.seguidores9 === undefined) ? null : data.seguidores9;
+      seguidores14Valor = (data.seguidores14 === null || data.seguidores14 === undefined) ? null : data.seguidores14;
+      render();
+      actualizarVisibilidadSeguidores();
+      actualizarParpadeoSeguidores();
+      renderEncuesta(data.encuesta || []);
+    }
+    delete window[cbName];
+    script.remove();
+  };
+  const script = document.createElement('script');
+  script.src = `${ENDPOINT_URL}?action=getData&fecha=${fecha}&callback=${cbName}`;
+  script.onerror = function(){ delete window[cbName]; script.remove(); };
+  document.body.appendChild(script);
+}
+
+/* ================= ESCRITURA ================= */
+function enviarDato(payload, onOk, onError){
+  fetch(ENDPOINT_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(res => {
+    if(res && res.ok){ onOk && onOk(); }
+    else { onError && onError(res && res.error); }
+  })
+  .catch((err) => { onError && onError(err && err.message); });
+}
+
+/* ================= ENCUESTA RÁPIDA ================= */
+const PALETA_ENCUESTA = ['#0194aa', '#80ba27', '#cad401', '#016b7c', '#5e8c17', '#7fd0dc', '#a3ab00', '#014b57', '#b7dc7a'];
+const PALETA_PROB = ['#c9d3d3', '#e3ea7a', '#cad401', '#80ba27', '#0194aa'];
+
+const OPC_P1 = ['Sí', 'No'];
+const OPC_P2 = ['UP Omega 3', 'PureScience', 'Vitamin Life', 'Sundown Fish Oil', 'Vitalux Plus', 'Dr. Simi', "Nature's Truth", 'Ninguna', 'Otras'];
+const OPC_P3 = ['Certificaciones', 'Cantidad de EPA y DHA', 'Tamaño de la cápsula', 'Precio', 'Recomendación de un profesional de la salud', 'Otras'];
+const OPC_PROB = ['Nada probable', 'Poco probable', 'Probable', 'Muy probable', 'Seguro'];
+
+const encSel = { p1:null, p2:null, p3:[], p4:null, p5:null };
+
+function crearChips(grupo, opciones, multiple){
+  const cont = document.getElementById('chips-' + grupo);
+  cont.innerHTML = '';
+  opciones.forEach(op => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'encuesta-chip' + (multiple ? ' multi' : '');
+    b.textContent = op;
+    b.dataset.val = op;
+    b.addEventListener('click', () => {
+      if(multiple){
+        const i = encSel[grupo].indexOf(op);
+        if(i >= 0){ encSel[grupo].splice(i, 1); b.classList.remove('sel'); }
+        else { encSel[grupo].push(op); b.classList.add('sel'); }
+      } else {
+        cont.querySelectorAll('.encuesta-chip').forEach(c => c.classList.remove('sel'));
+        b.classList.add('sel');
+        encSel[grupo] = op;
+      }
+      actualizarOtra(grupo);
+      if(grupo === 'p1') actualizarVisibilidadP2();
+    });
+    cont.appendChild(b);
+  });
+}
+
+function actualizarOtra(grupo){
+  const inp = document.getElementById('otra-' + grupo);
+  if(!inp) return;
+  const v = encSel[grupo];
+  const activa = Array.isArray(v) ? v.includes('Otras') : v === 'Otras';
+  inp.classList.toggle('visible', activa);
+  if(activa) inp.focus(); else inp.value = '';
+}
+
+function actualizarVisibilidadP2(){
+  const mostrar = encSel.p1 === 'Sí';
+  document.getElementById('bloque-p2').style.display = mostrar ? '' : 'none';
+  if(!mostrar){
+    encSel.p2 = null;
+    document.getElementById('chips-p2').querySelectorAll('.encuesta-chip').forEach(c => c.classList.remove('sel'));
+    actualizarOtra('p2');
+  }
+}
+
+function limpiarEncuesta(){
+  ['p1','p2','p3','p4','p5'].forEach(g => {
+    document.getElementById('chips-' + g).querySelectorAll('.encuesta-chip').forEach(c => c.classList.remove('sel'));
+  });
+  encSel.p1 = null; encSel.p2 = null; encSel.p3 = []; encSel.p4 = null; encSel.p5 = null;
+  ['otra-p2','otra-p3'].forEach(id => { const i = document.getElementById(id); i.value = ''; i.classList.remove('visible'); });
+  actualizarVisibilidadP2();
+}
+
+function contarOpciones(respuestas, opciones, colores, multiple){
+  const conteo = {};
+  opciones.forEach(o => conteo[o] = 0);
+  respuestas.forEach(r => {
+    const partes = multiple ? String(r || '').split('|').map(x => x.trim()) : [String(r || '').trim()];
+    partes.forEach(x => { if(conteo.hasOwnProperty(x)) conteo[x]++; });
+  });
+  return opciones
+    .map((o, i) => ({ nombre: o, valor: conteo[o], color: colores[i % colores.length] }))
+    .filter(g => g.valor > 0);
+}
+
+const charts = {};
+
+function dibujarDonut(n, grupos){
+  const canvas = document.getElementById('chart-encuesta-' + n);
+  const sinDatosEl = document.getElementById('sin-datos-' + n);
+  const leyendaEl = document.getElementById('leyenda-encuesta-' + n);
+
+  if(charts[n]){ charts[n].destroy(); charts[n] = null; }
+
+  const total = grupos.reduce((a, g) => a + g.valor, 0);
+  if(total === 0){
+    sinDatosEl.classList.add('visible');
+    canvas.style.visibility = 'hidden';
+    leyendaEl.innerHTML = '';
+    return;
+  }
+  sinDatosEl.classList.remove('visible');
+  canvas.style.visibility = 'visible';
+
+  if(typeof Chart !== 'undefined'){
+    charts[n] = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: grupos.map(g => g.nombre),
+        datasets: [{
+          data: grupos.map(g => g.valor),
+          backgroundColor: grupos.map(g => g.color),
+          borderColor: '#ffffff',
+          borderWidth: 3,
+          borderRadius: 4,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const pct = Math.round(ctx.parsed / total * 100);
+                return ` ${ctx.label}: ${formatNumero(ctx.parsed)} (${pct}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  leyendaEl.innerHTML = '';
+  grupos.forEach(g => {
+    const pct = Math.round(g.valor / total * 100);
+    const li = document.createElement('li');
+    li.className = 'leyenda-item';
+    li.innerHTML = `<span class="leyenda-dot" style="background:${g.color}"></span>
+      <span class="leyenda-label">${g.nombre}</span>
+      <span class="leyenda-valor">${formatNumero(g.valor)} (${pct}%)</span>`;
+    leyendaEl.appendChild(li);
+  });
+}
+
+function renderEncuesta(enc){
+  dibujarDonut(1, contarOpciones(enc.map(r => r.p1), OPC_P1, PALETA_ENCUESTA, false));
+  dibujarDonut(2, contarOpciones(enc.map(r => r.p2), OPC_P2, PALETA_ENCUESTA, false));
+  dibujarDonut(3, contarOpciones(enc.map(r => r.p3), OPC_P3, PALETA_ENCUESTA, true));
+  dibujarDonut(4, contarOpciones(enc.map(r => r.p4), OPC_PROB, PALETA_PROB, false));
+  dibujarDonut(5, contarOpciones(enc.map(r => r.p5), OPC_PROB, PALETA_PROB, false));
+}
+
+document.getElementById('btn-enviar-encuesta').addEventListener('click', () => {
+  const otraP2 = document.getElementById('otra-p2').value.trim();
+  const otraP3 = document.getElementById('otra-p3').value.trim();
+  if(!encSel.p1){ mostrarToast('Responde la pregunta 1', true); return; }
+  if(encSel.p1 === 'Sí' && !encSel.p2){ mostrarToast('Responde la pregunta 2', true); return; }
+  if(encSel.p1 === 'Sí' && encSel.p2 === 'Otras' && !otraP2){ mostrarToast('Escribe la otra marca', true); return; }
+  if(!encSel.p3.length){ mostrarToast('Responde la pregunta 3', true); return; }
+  if(encSel.p3.includes('Otras') && !otraP3){ mostrarToast('Escribe el otro aspecto', true); return; }
+  if(!encSel.p4){ mostrarToast('Responde la pregunta 4', true); return; }
+  if(!encSel.p5){ mostrarToast('Responde la pregunta 5', true); return; }
+
+  const p3 = OPC_P3.filter(o => encSel.p3.includes(o));
+  enviarDato(
+    {action:'submitEncuesta', fecha: fechaSeleccionada,
+     p1: encSel.p1, p2: encSel.p1 === 'Sí' ? encSel.p2 : '', p2Otra: (encSel.p1 === 'Sí' && encSel.p2 === 'Otras') ? otraP2 : '',
+     p3: p3.join(' | '), p3Otra: p3.includes('Otras') ? otraP3 : '',
+     p4: encSel.p4, p5: encSel.p5},
+    () => {
+      limpiarEncuesta();
+      mostrarToast('¡Gracias por responder!');
+      cargarDatos(fechaSeleccionada);
+    },
+    (msg) => mostrarToast('No se pudo registrar' + (msg ? ': ' + msg : '.'), true)
+  );
+});
+
+/* ================= SEGUIDORES (9:00 / 14:00) ================= */
+const MIN_0850 = 8*60 + 50;   // minutos desde medianoche
+const MIN_0900 = 9*60;
+const MIN_1350 = 13*60 + 50;
+const URL_FAMOID = 'https://famoid.com/es/contador-seguidores-instagram/';
+
+const entradaSeguidores = document.getElementById('seccion-seguidores-entrada');
+const selectorSegWrap = document.getElementById('selector-seguidores-wrap');
+const selectorSegBtn = document.getElementById('selector-seguidores-btn');
+const selectorSegLabel = document.getElementById('selector-seguidores-label');
+const selectorSegLista = document.getElementById('selector-seguidores-lista');
+const filaAccionSeguidores = document.getElementById('seguidores-accion-fila');
+const inputSeguidores = document.getElementById('input-seguidores');
+
+let horaSeguidoresSeleccionada = null; // '9' | '14' | null
+
+inputSeguidores.addEventListener('input', () => {
+  const soloDigitos = inputSeguidores.value.replace(/\D/g, '');
+  inputSeguidores.value = soloDigitos ? formatNumero(parseInt(soloDigitos, 10)) : '';
+});
+
+function valorNumericoSeguidores(){
+  const soloDigitos = inputSeguidores.value.replace(/\D/g, '');
+  return soloDigitos ? parseInt(soloDigitos, 10) : NaN;
+}
+
+function minutosDesdeMedianoche(){
+  const d = new Date();
+  return d.getHours()*60 + d.getMinutes();
+}
+
+selectorSegBtn.addEventListener('click', () => {
+  selectorSegWrap.classList.toggle('abierto');
+});
+document.addEventListener('click', (ev) => {
+  if(!selectorSegWrap.contains(ev.target)) selectorSegWrap.classList.remove('abierto');
+});
+
+function pintarOpcionesSeguidores(){
+  selectorSegLista.innerHTML = '';
+  const opciones = [];
+  if(seguidores9Valor === null) opciones.push({ hora:'9', texto:'Seguidores 9.00 hrs.' });
+  if(seguidores14Valor === null) opciones.push({ hora:'14', texto:'Seguidores 14.00 hrs.' });
+
+  opciones.forEach(op => {
+    const opt = document.createElement('div');
+    opt.className = 'opcion-fecha' + (horaSeguidoresSeleccionada === op.hora ? ' activa' : '');
+    opt.textContent = op.texto;
+    opt.addEventListener('click', () => {
+      horaSeguidoresSeleccionada = op.hora;
+      selectorSegWrap.classList.remove('abierto');
+      pintarOpcionesSeguidores();
+      filaAccionSeguidores.style.display = '';
+      inputSeguidores.value = '';
+    });
+    selectorSegLista.appendChild(opt);
+  });
+}
+
+function actualizarVisibilidadSeguidores(){
+  if(fechaSeleccionada !== FECHA_HOY){
+    entradaSeguidores.style.display = 'none';
+    return;
+  }
+  if(seguidores9Valor !== null && seguidores14Valor !== null){
+    entradaSeguidores.style.display = 'none';
+    return;
+  }
+  entradaSeguidores.style.display = '';
+  pintarOpcionesSeguidores();
+
+  if(horaSeguidoresSeleccionada === '9' && seguidores9Valor !== null) horaSeguidoresSeleccionada = null;
+  if(horaSeguidoresSeleccionada === '14' && seguidores14Valor !== null) horaSeguidoresSeleccionada = null;
+  if(horaSeguidoresSeleccionada === null){
+    filaAccionSeguidores.style.display = 'none';
+  }
+}
+
+function actualizarParpadeoSeguidores(){
+  if(fechaSeleccionada !== FECHA_HOY || entradaSeguidores.style.display === 'none'){
+    selectorSegWrap.classList.remove('parpadeando');
+    return;
+  }
+  const minutos = minutosDesdeMedianoche();
+  const faltaNueve = seguidores9Valor === null && minutos >= MIN_0850;
+  const faltaCatorce = seguidores14Valor === null && minutos >= MIN_1350;
+  selectorSegWrap.classList.toggle('parpadeando', faltaNueve || faltaCatorce);
+}
+setInterval(actualizarParpadeoSeguidores, 15000);
+
+document.getElementById('btn-consultar-seguidores').addEventListener('click', () => window.open(URL_FAMOID, '_blank'));
+
+document.getElementById('btn-ingresar-seguidores').addEventListener('click', () => {
+  if(!horaSeguidoresSeleccionada){
+    mostrarToast('Selecciona un horario primero', true);
+    return;
+  }
+  const val = valorNumericoSeguidores();
+  if(isNaN(val) || val < 0){
+    mostrarToast('Ingresa un número válido', true);
+    return;
+  }
+  const accion = horaSeguidoresSeleccionada === '9' ? 'submitSeguidores9' : 'submitSeguidores14';
+  enviarDato(
+    {action: accion, fecha: fechaSeleccionada, valor: val},
+    () => {
+      if(horaSeguidoresSeleccionada === '9') seguidores9Valor = val; else seguidores14Valor = val;
+      horaSeguidoresSeleccionada = null;
+      render();
+      actualizarVisibilidadSeguidores();
+      actualizarParpadeoSeguidores();
+      mostrarToast('Registrado correctamente');
+    },
+    (msg) => mostrarToast('No se pudo registrar' + (msg ? ': ' + msg : '.'), true)
+  );
+});
+
+/* ================= BARRA DESLIZANTE (estilo MALL MARINA) ================= */
+/* Centro = reposo. Llevar al extremo izquierdo = Ruleta; al derecho = Chequeo. */
+const MID = 50;
+const sl = document.getElementById('sl-bi');
+const slFill = document.getElementById('sl-fill');
+
+function moverBi(val){
+  val = parseInt(val, 10);
+  if(val < MID)      slFill.style.cssText = `left:${val}%;width:${MID-val}%;background:var(--teal);`;
+  else if(val > MID) slFill.style.cssText = `left:50%;width:${val-MID}%;background:var(--verde);`;
+  else               slFill.style.cssText = 'width:0';
+}
+
+function resetBi(){
+  sl.classList.add('volviendo');
+  slFill.style.transition = 'all 0.4s cubic-bezier(.22,.68,0,1.3)';
+  slFill.style.width = '0';
+  slFill.style.left = '50%';
+  requestAnimationFrame(() => {
+    sl.value = MID;
+    setTimeout(() => {
+      sl.classList.remove('volviendo');
+      slFill.style.transition = '';
+      slFill.style.cssText = 'width:0';
+    }, 420);
+  });
+}
+
+sl.addEventListener('input', () => moverBi(sl.value));
+let _tx = null, _ty = null, _dragging = false;
+sl.addEventListener('pointerdown', e => { _tx = e.clientX; _ty = e.clientY; _dragging = false; });
+sl.addEventListener('pointermove', e => {
+  if(_tx === null) return;
+  const dx = Math.abs(e.clientX - _tx), dy = Math.abs(e.clientY - _ty);
+  if(dx > 8 && dx > dy * 1.5) _dragging = true;
+});
+sl.addEventListener('pointerup', () => {
+  const val = parseInt(sl.value, 10);
+  resetBi();
+  if(_dragging){
+    if(val <= 2) registrarOpcion('Ruleta');
+    else if(val >= 98) registrarOpcion('Chequeo');
+  }
+  _tx = null; _ty = null; _dragging = false;
+});
+sl.addEventListener('pointercancel', () => { resetBi(); _tx = null; _ty = null; _dragging = false; });
+
+/* ================= REGISTRO (sin confirmación) ================= */
+function registrarOpcion(opcion){
+  enviarDato(
+    {action:'submitCombo', fecha: fechaSeleccionada, opcion: opcion},
+    () => {
+      if(opcion === 'Ruleta') cuentaRuleta++; else cuentaChequeo++;
+      render();
+      mostrarToast(`Registrado: ${opcion}`);
+      cargarListaFechas();
+    },
+    (msg) => mostrarToast('No se pudo registrar' + (msg ? ': ' + msg : '.'), true)
+  );
+}
+
+/* ================= INICIO ================= */
+crearChips('p1', OPC_P1, false);
+crearChips('p2', OPC_P2, false);
+crearChips('p3', OPC_P3, true);
+crearChips('p4', OPC_PROB, false);
+crearChips('p5', OPC_PROB, false);
+render();
+actualizarVisibilidadSeguidores();
+actualizarParpadeoSeguidores();
+renderEncuesta([]);
+cargarListaFechas();
+cargarDatos(fechaSeleccionada);
+setInterval(() => cargarDatos(fechaSeleccionada), REFRESH_MS);
+</script>
+</body>
+</html>
