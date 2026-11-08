@@ -814,7 +814,7 @@ function formatNumero(n){
 
 /* ================= RENDER ================= */
 function render(){
-  const total = cuentaRuleta + cuentaChequeo;
+  const total = cuentaRuleta + cuentaChequeo + cuentaDesafio;
   document.getElementById('suma-total').textContent = formatNumero(total);
   const pct = Math.round((total / META_SEGUIDORES) * 100);
   document.getElementById('botellas-pct').textContent = `(Meta ${formatNumero(pct)}%)`;
