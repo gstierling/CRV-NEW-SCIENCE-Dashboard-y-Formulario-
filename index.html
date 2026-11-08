@@ -491,6 +491,58 @@
   }
   .btn-enviar-encuesta:hover{filter:brightness(1.1);}
 
+  /* ===== Botón y ventana Desafío ===== */
+  .btn-desafio{
+    display:block;
+    width:100%;
+    background:linear-gradient(135deg, var(--teal-dark), var(--teal));
+    color:#ffffff;
+    border:none;
+    border-radius:18px;
+    padding:20px 16px;
+    font-family:'Nunito',sans-serif;
+    font-weight:900;
+    font-size:clamp(1.6rem, 8vw, 2.2rem);
+    letter-spacing:1px;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(1,107,124,0.25);
+  }
+  .btn-desafio:active{filter:brightness(0.92);}
+  .desafio-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:#ffffff;
+    flex-direction:column;
+  }
+  .desafio-overlay.abierto{display:flex;}
+  .desafio-barra{
+    flex-shrink:0;
+    display:flex;
+    justify-content:flex-end;
+    padding:8px 10px;
+    padding-top:calc(8px + env(safe-area-inset-top));
+    background:var(--teal-dark);
+  }
+  .btn-cerrar-desafio{
+    background:#ffffff;
+    color:var(--teal-dark);
+    border:none;
+    border-radius:10px;
+    padding:9px 16px;
+    font-family:'Nunito',sans-serif;
+    font-weight:900;
+    font-size:1rem;
+    cursor:pointer;
+  }
+  .desafio-frame{
+    flex:1;
+    width:100%;
+    border:none;
+    display:block;
+  }
+
   /* ===== Gráficas de la encuesta (donut) ===== */
   .seccion-graficos-encuesta{
     display:flex;
@@ -753,9 +805,18 @@
       <ul class="grafico-leyenda" id="leyenda-encuesta-5"></ul>
     </div>
   </div>
+
+  <button class="btn-desafio" id="btn-desafio" type="button">Desafío</button>
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="desafio-overlay" id="desafio-overlay">
+  <div class="desafio-barra">
+    <button class="btn-cerrar-desafio" id="btn-cerrar-desafio" type="button">✕ Volver al dashboard</button>
+  </div>
+  <iframe class="desafio-frame" id="desafio-frame" title="Desafío" allow="fullscreen"></iframe>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
@@ -1305,6 +1366,22 @@ function registrarOpcion(opcion){
     (msg) => mostrarToast('No se pudo registrar' + (msg ? ': ' + msg : '.'), true)
   );
 }
+
+/* ================= DESAFÍO (se abre dentro del dashboard) ================= */
+const DESAFIO_URL = 'https://gstierling.github.io/CRV-DESAFIO-Tubo-con-agua/';
+const desafioOverlay = document.getElementById('desafio-overlay');
+const desafioFrame = document.getElementById('desafio-frame');
+
+document.getElementById('btn-desafio').addEventListener('click', () => {
+  desafioFrame.src = DESAFIO_URL + '?t=' + Date.now();   // juego nuevo cada vez que se abre
+  desafioOverlay.classList.add('abierto');
+  document.body.style.overflow = 'hidden';
+});
+document.getElementById('btn-cerrar-desafio').addEventListener('click', () => {
+  desafioOverlay.classList.remove('abierto');
+  desafioFrame.src = 'about:blank';
+  document.body.style.overflow = '';
+});
 
 /* ================= INICIO ================= */
 centrarKnob();
