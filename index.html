@@ -1290,13 +1290,30 @@ const DIRECCIONES = [
 let arrastrando = false;
 let centroX = 0, centroY = 0;
 let padRadio = 100;
+let dirFija = null;      // dirección elegida: el botón se mueve solo en línea recta sobre ella
+let avance = 0;          // cuánto avanzó sobre esa línea (px)
+const BLOQUEO_PX = 14;   // movimiento mínimo para decidir la dirección
 
 function centrarKnob(){
   knob.style.transform = 'translate(-50%, -50%)';
 }
 
+function elegirDireccion(dx, dy){
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const ndx = dx/dist, ndy = dy/dist;
+  if(ndy > 0.7071) return null;           // hacia abajo no hay opción
+  let mejor = null, mejorProd = -Infinity;
+  DIRECCIONES.forEach(d => {
+    const prod = d.dx*ndx + d.dy*ndy;
+    if(prod > mejorProd){ mejorProd = prod; mejor = d; }
+  });
+  return mejor;
+}
+
 knob.addEventListener('pointerdown', (ev) => {
   arrastrando = true;
+  dirFija = null;
+  avance = 0;
   knob.style.transition = 'none';
   knob.setPointerCapture(ev.pointerId);
   const rect = pad.getBoundingClientRect();
@@ -1308,44 +1325,43 @@ knob.addEventListener('pointerdown', (ev) => {
 
 knob.addEventListener('pointermove', (ev) => {
   if(!arrastrando) return;
-  let dx = ev.clientX - centroX;
-  let dy = ev.clientY - centroY;
-  const dist = Math.sqrt(dx*dx + dy*dy);
-  if(dist > padRadio){
-    dx = dx / dist * padRadio;
-    dy = dy / dist * padRadio;
+  const dx = ev.clientX - centroX;
+  const dy = ev.clientY - centroY;
+
+  if(!dirFija){
+    if(Math.sqrt(dx*dx + dy*dy) < BLOQUEO_PX) return;
+    dirFija = elegirDireccion(dx, dy);
+    if(!dirFija) return;
   }
-  knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+  // Proyección sobre la línea elegida: el botón no se sale del riel
+  avance = Math.max(0, Math.min(padRadio, dx*dirFija.dx + dy*dirFija.dy));
+
+  // Si vuelve al centro, se libera para poder elegir otra dirección
+  if(avance < 4){ dirFija = null; avance = 0; centrarKnob(); return; }
+
+  knob.style.transform = `translate(calc(-50% + ${dirFija.dx*avance}px), calc(-50% + ${dirFija.dy*avance}px))`;
 });
 
-function soltarKnob(ev){
+function soltarKnob(){
   if(!arrastrando) return;
   arrastrando = false;
   knob.classList.remove('activo');
-  const dx = ev.clientX - centroX;
-  const dy = ev.clientY - centroY;
-  const dist = Math.sqrt(dx*dx + dy*dy);
-
   knob.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
   centrarKnob();
 
-  const umbral = padRadio * 0.67;
-  if(dist < umbral) return;
-
-  const ndx = dx/dist, ndy = dy/dist;
-  // Hacia abajo no registra nada (no hay opción en esa dirección)
-  if(ndy > 0.7071) return;
-  let mejor = null, mejorProd = -Infinity;
-  DIRECCIONES.forEach(d => {
-    const prod = d.dx*ndx + d.dy*ndy;
-    if(prod > mejorProd){ mejorProd = prod; mejor = d; }
-  });
-  if(mejor) registrarOpcion(mejor.opcion);
+  const elegida = dirFija;
+  const llego = avance >= padRadio * 0.67;
+  dirFija = null;
+  avance = 0;
+  if(elegida && llego) registrarOpcion(elegida.opcion);
 }
 
 knob.addEventListener('pointerup', soltarKnob);
 knob.addEventListener('pointercancel', () => {
   arrastrando = false;
+  dirFija = null;
+  avance = 0;
   knob.classList.remove('activo');
   knob.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
   centrarKnob();
